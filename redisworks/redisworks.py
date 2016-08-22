@@ -60,7 +60,7 @@ class Root(Dot):
                 new_value = json.dumps(value)
                 the_type = MutableMapping
             else:
-                value = {i: Root.doformat(i, force_serialize=True) for i in value}
+                value = {Root.doformat(i, force_serialize=True): Root.doformat(value[i], force_serialize=True) for i in value}
                 return value
         elif isinstance(value, Iterable):
             if force_serialize:
