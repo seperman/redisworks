@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
 from dot import Dot
 from redis import StrictRedis
 from redisworks.helper import py3
@@ -55,7 +54,6 @@ def str_to_class(name):
     except AttributeError:
         result = OTHER_STANDARD_TYPES[name]
     return result
-    # return reduce(getattr, str.split("."), sys.modules[__name__])
 
 
 class Root(Dot):

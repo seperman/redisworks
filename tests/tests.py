@@ -44,6 +44,15 @@ class RedisworksTestCase(unittest.TestCase):
             self.root.flush()
             self.assertEqual(self.root.part, val)
 
+    def test_return_string(self):
+        root2 = Root(redis=FakeStrictRedis, return_object=False)
+        val = 11.1
+        expected_result = b'11.1'
+        root2.part = val
+        # flushing dotobject local cache
+        root2.flush()
+        self.assertEqual(root2.part, expected_result)
+
     def test_grandchild(self):
         string = "for real?"
         self.root.haha.wahaha = string
