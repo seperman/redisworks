@@ -45,7 +45,7 @@ class Root(Dot):
         if the_type:
             new_value = json.dumps(value)
         elif isinstance(value, strings):
-            pass
+            return value.encode('utf-8')
         elif isinstance(value, sets):
             if force_serialize:
                 new_value = json.dumps(value)

@@ -24,6 +24,10 @@ class RedisworksTestCase(unittest.TestCase):
         self.root = Root(redis=FakeStrictRedis)
         self.red = FakeStrictRedis()
 
+    def tearDown(self):
+        # Clear data in fakeredis.
+        self.red.flushall()
+
     def test_save_child_str(self):
         num = 10
         self.root.part = num
@@ -49,4 +53,25 @@ class RedisworksTestCase(unittest.TestCase):
         expected_result = Root.doformat(value)
         self.root.part_dic = value
         result = self.red.hgetall('root.part_dic')
+        self.assertEqual(result, expected_result)
+
+    def test_save_child_nested_dict(self):
+        value = {1: 1, 2: {"a": "hello"}, 3: 4}
+        expected_result = Root.doformat(value)
+        self.root.part = value
+        result = self.red.hgetall('root.part')
+        self.assertEqual(result, expected_result)
+
+    def test_save_child_iterable(self):
+        value = [1, 3, "a"]
+        expected_result = Root.doformat(value)
+        self.root.part = value
+        result = self.red.lrange("root.part", 0, -1)
+        self.assertEqual(result, expected_result)
+
+    def test_save_child_nested_iterable(self):
+        value = [1, 3, ["a", 3]]
+        expected_result = Root.doformat(value)
+        self.root.part = value
+        result = self.red.lrange("root.part", 0, -1)
         self.assertEqual(result, expected_result)
