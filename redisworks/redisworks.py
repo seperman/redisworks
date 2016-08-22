@@ -97,7 +97,7 @@ class Root(Dot):
                 global_type, actual_type, value = value.split(bITEM_DIVIDER)
                 actual_type = str_to_class(actual_type.decode('utf-8'))
                 value = actual_type(value)
-                result.append(value)
+            result.append(value)
 
         return dict(zip(paths, result))
 

@@ -39,10 +39,14 @@ class RedisworksTestCase(unittest.TestCase):
         self.assertEqual(self.root.part, num)
 
     def test_grandchild_str(self):
-        self.root.haha.wahaha = "for real?"
+        string = "for real?"
+        self.root.haha.wahaha = string
         result = self.red.get('root.haha.wahaha')
-        expected_result = b'for real?'
+        expected_result = string.encode('utf-8')
         self.assertEqual(result, expected_result)
+        # flushing dotobject local cache
+        self.root.flush()
+        self.assertEqual(self.root.haha.wahaha, string)
 
     def test_child_set(self):
         value = {1, 2, 4}
