@@ -10,6 +10,8 @@ from decimal import Decimal
 from collections import Iterable
 from collections import MutableMapping
 import json
+import logging
+logger = logging.getLogger(__name__)
 
 sets = (set, frozenset)
 if py3:  # pragma: no cover
@@ -23,6 +25,7 @@ else:  # pragma: no cover
     numbers = (int, float, long, complex, datetime.datetime, datetime.date, Decimal)
     items = 'iteritems'
     import __builtin__ as builtins
+
 
 TYPE_IDENTIFIER = '__-'
 bTYPE_IDENTIFIER = TYPE_IDENTIFIER.encode('utf-8')
@@ -127,20 +130,48 @@ class Root(Dot):
 
         return value
 
+    def get_str(self, value):
+        if value.startswith(bTYPE_IDENTIFIER):
+            value = value.strip(bTYPE_IDENTIFIER)
+            global_type, actual_type, value = value.split(bITEM_DIVIDER)
+            if self.return_object:
+                value = self.get_obj(value, actual_type)
+        return value
+
     def load(self, paths):
         # import ipdb; ipdb.set_trace()
+        # majority of keys are strings so we first try to get the string ones.
+        result = {}
         values = self.red.mget(paths)
 
-        result = []
-        for value in values:
-            if value.startswith(bTYPE_IDENTIFIER):
-                value = value.strip(bTYPE_IDENTIFIER)
-                global_type, actual_type, value = value.split(bITEM_DIVIDER)
-                if self.return_object:
-                    value = self.get_obj(value, actual_type)
-            result.append(value)
+        for i, value in enumerate(values):
+            key = paths[i]
+            if value is None:
+                redis_type = self.red.type(key)
+                if redis_type is None:
+                    logger.error("Unable to get item: %s", key)
+                elif redis_type == "string":
+                    continue
+                elif redis_type == "list":
+                    value = self.red.lrange(key, 0, -1)
+                elif redis_type == "set":
+                    value = self.red.smembers(key)
+                elif redis_type == "hash":
+                    value = self.red.hgetall(key)
+                else:
+                    value = "NOT SUPPORTED BY REDISWORKS."
+            else:
+                if isinstance(value, strings):
+                    value = self.get_str(value)
+                elif isinstance(value, sets):
+                    value = {self.get_str(i) for i in value}
+                elif isinstance(value, MutableMapping):
+                    value = {self.get_str(i): self.get_str(value[i]) for i in value}
+                elif isinstance(value, Iterable):
+                    value = [self.get_str(i) for i in value]
+            result[key] = value
 
-        return dict(zip(paths, result))
+        return result
 
     def save(self, path, value):
         if isinstance(value, strings):

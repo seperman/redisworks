@@ -69,6 +69,9 @@ class RedisworksTestCase(unittest.TestCase):
         self.root.part_set = value
         result = self.red.smembers('root.part_set')
         self.assertEqual(result, expected_result)
+        # flushing dotobject local cache
+        self.root.flush()
+        self.assertEqual(self.root.part_set, value)
 
     def test_child_dict(self):
         value = {1: 1, 2: 2, 3: 4}
