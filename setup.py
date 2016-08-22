@@ -13,7 +13,7 @@ except:
     long_description = "Pythonic Redis Client."
 
 setup(name='redisworks',
-      version='0.1.0',
+      version='0.2.0',
       description='Pythonic Redis Client.',
       url='https://github.com/seperman/redisworks',
       download_url='https://github.com/seperman/redisworks/tarball/master',
