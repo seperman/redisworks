@@ -27,6 +27,7 @@ setup(name='redisworks',
           'redis',
           'dotobject'
       ],
+      tests_require=['fakeredis==0.8.1'],
       classifiers=[
           "Intended Audience :: Developers",
           "Operating System :: OS Independent",
