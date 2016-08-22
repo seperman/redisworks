@@ -1,0 +1,2 @@
+# redisworks
+Pythonic Redis Client
