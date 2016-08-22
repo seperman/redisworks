@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from __future__ import absolute_import
 
 """
 To run the test, run this in the this of repo:
@@ -14,6 +15,7 @@ from decimal import Decimal
 import datetime
 
 from redisworks import Root
+from redisworks.redisworks import bTYPE_IDENTIFIER, bITEM_DIVIDER
 from fakeredis import FakeStrictRedis
 import logging
 logging.disable(logging.CRITICAL)
@@ -29,6 +31,16 @@ class RedisworksTestCase(unittest.TestCase):
     def tearDown(self):
         # Clear data in fakeredis.
         self.red.flushall()
+
+    def test_nested_format(self):
+        value = {1: 1, 2: {"a": "hello"}}
+        result = Root.doformat(value)
+        int_str = bTYPE_IDENTIFIER + b'num' + bITEM_DIVIDER + b'int' + bITEM_DIVIDER
+        expected_result = {int_str + b'1': int_str + b'1',
+                           int_str + b'2': bTYPE_IDENTIFIER +
+                           b'dict' + bITEM_DIVIDER +
+                           b'dict' + bITEM_DIVIDER + b'{"a": "hello"}'}
+        self.assertEqual(result, expected_result)
 
     def test_numbers(self):
         today = datetime.date.today()
@@ -59,7 +71,6 @@ class RedisworksTestCase(unittest.TestCase):
         result = self.red.get('root.haha.wahaha')
         expected_result = Root.doformat(string)
         self.assertEqual(result, expected_result)
-        # flushing dotobject local cache
         self.root.flush()
         self.assertEqual(self.root.haha.wahaha, string)
 
@@ -69,7 +80,6 @@ class RedisworksTestCase(unittest.TestCase):
         self.root.part_set = value
         result = self.red.smembers('root.part_set')
         self.assertEqual(result, expected_result)
-        # flushing dotobject local cache
         self.root.flush()
         self.assertEqual(self.root.part_set, value)
 
@@ -79,6 +89,8 @@ class RedisworksTestCase(unittest.TestCase):
         self.root.part_dic = value
         result = self.red.hgetall('root.part_dic')
         self.assertEqual(result, expected_result)
+        self.root.flush()
+        self.assertEqual(self.root.part_dic, value)
 
     def test_child_nested_dict(self):
         value = {1: 1, 2: {"a": "hello"}, 3: 4}
@@ -86,6 +98,8 @@ class RedisworksTestCase(unittest.TestCase):
         self.root.part = value
         result = self.red.hgetall('root.part')
         self.assertEqual(result, expected_result)
+        self.root.flush()
+        self.assertEqual(self.root.part, value)
 
     def test_child_iterable(self):
         value = [1, 3, "a"]

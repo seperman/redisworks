@@ -27,7 +27,7 @@ else:  # pragma: no cover
     import __builtin__ as builtins
 
 
-TYPE_IDENTIFIER = '__-'
+TYPE_IDENTIFIER = '!__'
 bTYPE_IDENTIFIER = TYPE_IDENTIFIER.encode('utf-8')
 ITEM_DIVIDER = '|==|'
 bITEM_DIVIDER = ITEM_DIVIDER.encode('utf-8')
@@ -166,6 +166,8 @@ class Root(Dot):
                 elif isinstance(value, sets):
                     value = {self.get_str(i) for i in value}
                 elif isinstance(value, MutableMapping):
+                    import ipdb; ipdb.set_trace()
+                    print ({i: value[i] for i in value})
                     value = {self.get_str(i): self.get_str(value[i]) for i in value}
                 elif isinstance(value, Iterable):
                     value = [self.get_str(i) for i in value]
