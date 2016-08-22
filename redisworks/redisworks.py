@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
 from dot import Dot
 from redis import StrictRedis
 from redisworks.helper import py3
@@ -16,19 +17,32 @@ if py3:  # pragma: no cover
     strings = (str, bytes)  # which are both basestring
     numbers = (int, float, complex, datetime.datetime, datetime.date, Decimal)
     items = 'items'
+    from functools import reduce
 else:  # pragma: no cover
     strings = (str, unicode)
     numbers = (int, float, long, complex, datetime.datetime, datetime.date, Decimal)
     items = 'iteritems'
 
+TYPE_IDENTIFIER = '_|_'
+bTYPE_IDENTIFIER = TYPE_IDENTIFIER.encode('utf-8')
+ITEM_DIVIDER = '#+$|'
+bITEM_DIVIDER = ITEM_DIVIDER.encode('utf-8')
 
 TYPE_FORMATS = {
-    numbers: "__num|{type}|{value}",
-    sets: "__set|{type}|{value}",
-    MutableMapping: "__dict|{type}|{value}",
-    Iterable: "__iterable|{type}|{value}",
-    "obj": "__obj|{type}|{value}",
+    numbers: "num",
+    sets: "set",
+    MutableMapping: "dict",
+    Iterable: "iterable",
+    "obj": "obj",
 }
+
+for i in TYPE_FORMATS:
+    TYPE_FORMATS[i] = TYPE_IDENTIFIER + TYPE_FORMATS[i] + ITEM_DIVIDER +\
+                      '{actual_type}' + ITEM_DIVIDER + '{value}'
+
+
+def str_to_class(str):
+    return reduce(getattr, str.split("."), sys.modules[__name__])
 
 
 class Root(Dot):
@@ -70,12 +84,22 @@ class Root(Dot):
                 value = [Root.doformat(i, force_serialize=True) for i in value]
                 return value
         new_value = new_value if new_value else value
-        value = TYPE_FORMATS[the_type].format(type=value.__class__.__name__, value=new_value)
+        value = TYPE_FORMATS[the_type].format(actual_type=value.__class__.__name__, value=new_value)
         return value.encode('utf-8')
 
     def load(self, paths):
         values = self.red.mget(paths)
-        return dict(zip(paths, values))
+
+        result = []
+        for value in values:
+            if value.startswith(bTYPE_IDENTIFIER):
+                value = value.strip(bTYPE_IDENTIFIER)
+                global_type, actual_type, value = value.split(bITEM_DIVIDER)
+                actual_type = str_to_class(actual_type.decode('utf-8'))
+                value = actual_type(value)
+                result.append(value)
+
+        return dict(zip(paths, result))
 
     def save(self, path, value):
         if isinstance(value, strings):
