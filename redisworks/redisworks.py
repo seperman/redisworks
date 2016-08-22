@@ -21,8 +21,14 @@ else:  # pragma: no cover
     numbers = (int, float, long, complex, datetime.datetime, datetime.date, Decimal)
     items = 'iteritems'
 
-NUM_IDEN = "__num|{type}|{number}"
-DIC_IDEN = "__dict|{blob}"
+
+TYPE_FORMATS = {
+    numbers: "__num|{type}|{value}",
+    sets: "__set|{type}|{value}",
+    MutableMapping: "__dict|{type}|{value}",
+    Iterable: "__iterable|{type}|{value}",
+    "obj": "__obj|{type}|{value}",
+}
 
 
 class Root(Dot):
@@ -34,8 +40,37 @@ class Root(Dot):
         self.setup()
 
     @staticmethod
-    def format_num(value):
-        value = NUM_IDEN.format(type=value.__class__.__name__, number=value)
+    def doformat(value, the_type=None, force_serialize=False):
+        new_value = None
+        if the_type:
+            new_value = json.dumps(value)
+        elif isinstance(value, strings):
+            pass
+        elif isinstance(value, sets):
+            if force_serialize:
+                new_value = json.dumps(value)
+                the_type = sets
+            else:
+                value = [Root.doformat(i, force_serialize=True) for i in value]
+                return value
+        elif isinstance(value, numbers):
+            the_type = numbers
+        elif isinstance(value, MutableMapping):
+            if force_serialize:
+                new_value = json.dumps(value)
+                the_type = MutableMapping
+            else:
+                value = {i: Root.doformat(i, force_serialize=True) for i in value}
+                return value
+        elif isinstance(value, Iterable):
+            if force_serialize:
+                new_value = json.dumps(value)
+                the_type = Iterable
+            else:
+                value = [Root.doformat(i, force_serialize=True) for i in value]
+                return value
+        new_value = new_value if new_value else value
+        value = TYPE_FORMATS[the_type].format(type=value.__class__.__name__, value=new_value)
         return value.encode('utf-8')
 
     def load(self, paths):
@@ -46,17 +81,17 @@ class Root(Dot):
         if isinstance(value, strings):
             self.red.set(path, value)
         elif isinstance(value, sets):
-            self.red.sadd(path, value)
+            value = self.doformat(value)
+            self.red.sadd(path, *value)
         elif isinstance(value, numbers):
-            value = self.format_num(value)
+            value = self.doformat(value)
             self.red.set(path, value)
         elif isinstance(value, MutableMapping):
-            value = json.dumps(value)
-            value = DIC_IDEN.format(value)
-            self.red.set(path, value)
+            value = self.doformat(value)
+            self.red.hmset(path, value)
         elif isinstance(value, Iterable):
+            value = self.doformat(value)
             self.red.rpush(path, *value)
         else:
-            value = json.dumps(value)
-            value = DIC_IDEN.format(value)
+            value = self.doformat(value, the_type="obj")
             self.red.set(path, value)

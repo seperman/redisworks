@@ -25,11 +25,18 @@ class RedisworksTestCase(unittest.TestCase):
         num = 10
         self.root.part = num
         result = self.red.get('root.part')
-        expected_result = Root.format_num(num)
+        expected_result = Root.doformat(num)
         self.assertEqual(result, expected_result)
 
     def test_save_grandchild_str(self):
         self.root.haha.wahaha = "for real?"
         result = self.red.get('root.haha.wahaha')
         expected_result = b'for real?'
+        self.assertEqual(result, expected_result)
+
+    def test_save_child_set(self):
+        value = {1, 2, 4}
+        expected_result = set(Root.doformat(value))
+        self.root.part = value
+        result = self.red.smembers('root.part')
         self.assertEqual(result, expected_result)
