@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+from __future__ import absolute_import
+from __future__ import print_function
 from dot import Dot
 from redis import StrictRedis
 from redisworks.helper import py3
@@ -109,24 +110,20 @@ class Root(Dot):
         actual_type = str_to_class(actual_type.decode('utf-8'))
 
         if py3:
-            if actual_type is str:
+            if actual_type is not bytes:
                 value = value.decode('utf-8')
-            elif actual_type in {Decimal, complex}:
-                value = value.decode('utf-8')
-                value = actual_type(value)
-            elif actual_type is datetime.datetime:
-                value = value.decode('utf-8')
-                value = datetime.datetime.strptime(value, DATETIME_FORMAT)
-            elif actual_type is datetime.date:
-                value = value.decode('utf-8')
-                value = datetime.datetime.strptime(value, DATE_FORMAT).date()
-            else:
-                value = actual_type(value)
         else:
             if actual_type is unicode:
                 value = value.decode('utf-8')
-            else:
-                value = actual_type(value)
+
+        if actual_type in {Decimal, complex}:
+            value = actual_type(value)
+        elif actual_type is datetime.datetime:
+            value = datetime.datetime.strptime(value, DATETIME_FORMAT)
+        elif actual_type is datetime.date:
+            value = datetime.datetime.strptime(value, DATE_FORMAT).date()
+        else:
+            value = actual_type(value)
 
         return value
 
