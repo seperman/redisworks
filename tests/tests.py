@@ -10,6 +10,8 @@ To run a specific test, run this from the root of repo:
     python -m unittest tests.tests.RedisworksTestCase.test_child_dict
 """
 import unittest
+from decimal import Decimal
+import datetime
 
 from redisworks import Root
 from fakeredis import FakeStrictRedis
@@ -28,21 +30,25 @@ class RedisworksTestCase(unittest.TestCase):
         # Clear data in fakeredis.
         self.red.flushall()
 
-    def test_child_str(self):
-        num = 10
-        self.root.part = num
-        result = self.red.get('root.part')
-        expected_result = Root.doformat(num)
-        self.assertEqual(result, expected_result)
-        # flushing dotobject local cache
-        self.root.flush()
-        self.assertEqual(self.root.part, num)
+    def test_numbers(self):
+        today = datetime.date.today()
+        now = datetime.datetime.utcnow()
+        items = (10, 10.1, Decimal("10"), 10+1j, today, now)
 
-    def test_grandchild_str(self):
+        for val in items:
+            self.root.part = val
+            result = self.red.get('root.part')
+            expected_result = Root.doformat(val)
+            self.assertEqual(result, expected_result)
+            # flushing dotobject local cache
+            self.root.flush()
+            self.assertEqual(self.root.part, val)
+
+    def test_grandchild(self):
         string = "for real?"
         self.root.haha.wahaha = string
         result = self.red.get('root.haha.wahaha')
-        expected_result = string.encode('utf-8')
+        expected_result = Root.doformat(string)
         self.assertEqual(result, expected_result)
         # flushing dotobject local cache
         self.root.flush()

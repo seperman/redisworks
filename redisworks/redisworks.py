@@ -17,23 +17,31 @@ if py3:  # pragma: no cover
     strings = (str, bytes)  # which are both basestring
     numbers = (int, float, complex, datetime.datetime, datetime.date, Decimal)
     items = 'items'
-    from functools import reduce
+    import builtins
 else:  # pragma: no cover
     strings = (str, unicode)
     numbers = (int, float, long, complex, datetime.datetime, datetime.date, Decimal)
     items = 'iteritems'
+    import __builtin__ as builtins
 
-TYPE_IDENTIFIER = '_|_'
+TYPE_IDENTIFIER = '__-'
 bTYPE_IDENTIFIER = TYPE_IDENTIFIER.encode('utf-8')
-ITEM_DIVIDER = '#+$|'
+ITEM_DIVIDER = '|==|'
 bITEM_DIVIDER = ITEM_DIVIDER.encode('utf-8')
+
+DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+DATE_FORMAT = "%Y-%m-%d"
+
+# In addition to built in types:
+OTHER_STANDARD_TYPES = {'Decimal': Decimal, 'datetime': datetime.datetime, 'date': datetime.date}
 
 TYPE_FORMATS = {
     numbers: "num",
     sets: "set",
     MutableMapping: "dict",
-    Iterable: "iterable",
+    Iterable: "list",
     "obj": "obj",
+    strings: "str"
 }
 
 for i in TYPE_FORMATS:
@@ -41,16 +49,23 @@ for i in TYPE_FORMATS:
                       '{actual_type}' + ITEM_DIVIDER + '{value}'
 
 
-def str_to_class(str):
-    return reduce(getattr, str.split("."), sys.modules[__name__])
+def str_to_class(name):
+    try:
+        result = getattr(builtins, name)
+    except AttributeError:
+        result = OTHER_STANDARD_TYPES[name]
+    return result
+    # return reduce(getattr, str.split("."), sys.modules[__name__])
 
 
 class Root(Dot):
 
-    def __init__(self, host='localhost', port=6379, db=0, *args, **kwargs):
+    def __init__(self, host='localhost', port=6379, db=0,
+                 return_object=True, *args, **kwargs):
         redis = kwargs.pop('redis', StrictRedis)
         super(Root, self).__init__(*args, **kwargs)
         self.red = redis(host=host, port=port, db=db)
+        self.return_object = return_object
         self.setup()
 
     @staticmethod
@@ -59,7 +74,7 @@ class Root(Dot):
         if the_type:
             new_value = json.dumps(value)
         elif isinstance(value, strings):
-            return value.encode('utf-8')
+            the_type = strings
         elif isinstance(value, sets):
             if force_serialize:
                 new_value = json.dumps(value)
@@ -69,6 +84,10 @@ class Root(Dot):
                 return value
         elif isinstance(value, numbers):
             the_type = numbers
+            if isinstance(value, datetime.datetime):
+                new_value = value.strftime(DATETIME_FORMAT)
+            elif isinstance(value, datetime.date):
+                new_value = value.strftime(DATE_FORMAT)
         elif isinstance(value, MutableMapping):
             if force_serialize:
                 new_value = json.dumps(value)
@@ -87,7 +106,34 @@ class Root(Dot):
         value = TYPE_FORMATS[the_type].format(actual_type=value.__class__.__name__, value=new_value)
         return value.encode('utf-8')
 
+    @staticmethod
+    def get_obj(value, actual_type):
+        actual_type = str_to_class(actual_type.decode('utf-8'))
+
+        if py3:
+            if actual_type is str:
+                value = value.decode('utf-8')
+            elif actual_type in {Decimal, complex}:
+                value = value.decode('utf-8')
+                value = actual_type(value)
+            elif actual_type is datetime.datetime:
+                value = value.decode('utf-8')
+                value = datetime.datetime.strptime(value, DATETIME_FORMAT)
+            elif actual_type is datetime.date:
+                value = value.decode('utf-8')
+                value = datetime.datetime.strptime(value, DATE_FORMAT).date()
+            else:
+                value = actual_type(value)
+        else:
+            if actual_type is unicode:
+                value = value.decode('utf-8')
+            else:
+                value = actual_type(value)
+
+        return value
+
     def load(self, paths):
+        # import ipdb; ipdb.set_trace()
         values = self.red.mget(paths)
 
         result = []
@@ -95,14 +141,15 @@ class Root(Dot):
             if value.startswith(bTYPE_IDENTIFIER):
                 value = value.strip(bTYPE_IDENTIFIER)
                 global_type, actual_type, value = value.split(bITEM_DIVIDER)
-                actual_type = str_to_class(actual_type.decode('utf-8'))
-                value = actual_type(value)
+                if self.return_object:
+                    value = self.get_obj(value, actual_type)
             result.append(value)
 
         return dict(zip(paths, result))
 
     def save(self, path, value):
         if isinstance(value, strings):
+            value = self.doformat(value)
             self.red.set(path, value)
         elif isinstance(value, sets):
             value = self.doformat(value)
