@@ -130,3 +130,15 @@ class RedisworksTestCase(unittest.TestCase):
         self.assertEqual(self.root.part_set, set_value)
         self.assertEqual(self.root.part_dict, dict_value)
         self.assertEqual(self.root.part_list, list_value)
+
+    def test_many_different_children_types2(self):
+        mylist = [1, 3, 4]
+        self.root.my.list = mylist
+        some_date = datetime.datetime(2016, 8, 22, 10, 3, 19)
+        self.root.time = some_date
+        mydict = {1: 1, "a": "b"}
+        self.root.the.mapping.example = mydict
+        self.root.flush()
+        self.assertEqual(self.root.my.list, mylist)
+        self.assertEqual(self.root.time, some_date)
+        self.assertEqual(self.root.the.mapping.example, mydict)
