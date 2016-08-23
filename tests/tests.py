@@ -118,3 +118,15 @@ class RedisworksTestCase(unittest.TestCase):
         self.assertEqual(result, expected_result)
         self.root.flush()
         self.assertEqual(self.root.part, value)
+
+    def test_many_different_children_types(self):
+        set_value = {1, 2, 4}
+        self.root.part_set = set_value
+        dict_value = {1: 1, 2: {"a": 1}}
+        self.root.part_dict = dict_value
+        list_value = [1, ["b", 3]]
+        self.root.part_list = list_value
+        self.root.flush()
+        self.assertEqual(self.root.part_set, set_value)
+        self.assertEqual(self.root.part_dict, dict_value)
+        self.assertEqual(self.root.part_list, list_value)
