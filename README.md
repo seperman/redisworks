@@ -2,6 +2,12 @@
 
 **The Pythonic Redis Client**
 
+Why Redisworks?
+
+- Lazy Redis Queries
+- Dynamic Typing
+- Ease of use
+
 Have you ever used PyRedis and wondered why you have to think about types all the time? That you have to constantly convert objects to strings and back and forth since Redis keeps most things as strings?
 
 That's why I wrote Redisworks. Redis works provides a Pythonic interface to Redis. Let Redisworks take care of type conversions for you.
