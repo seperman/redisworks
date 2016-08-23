@@ -125,6 +125,8 @@ class Root(Dot):
             value = datetime.datetime.strptime(value, DATETIME_FORMAT)
         elif actual_type is datetime.date:
             value = datetime.datetime.strptime(value, DATE_FORMAT).date()
+        elif actual_type in {dict, list} or isinstance(actual_type, (MutableMapping, Iterable)):
+            value = json.loads(value)
         else:
             value = actual_type(value)
 
@@ -166,8 +168,6 @@ class Root(Dot):
                 elif isinstance(value, sets):
                     value = {self.get_str(i) for i in value}
                 elif isinstance(value, MutableMapping):
-                    import ipdb; ipdb.set_trace()
-                    print ({i: value[i] for i in value})
                     value = {self.get_str(i): self.get_str(value[i]) for i in value}
                 elif isinstance(value, Iterable):
                     value = [self.get_str(i) for i in value]

@@ -107,6 +107,8 @@ class RedisworksTestCase(unittest.TestCase):
         self.root.part = value
         result = self.red.lrange("root.part", 0, -1)
         self.assertEqual(result, expected_result)
+        self.root.flush()
+        self.assertEqual(self.root.part, value)
 
     def test_child_nested_iterable(self):
         value = [1, 3, ["a", 3]]
@@ -114,3 +116,5 @@ class RedisworksTestCase(unittest.TestCase):
         self.root.part = value
         result = self.red.lrange("root.part", 0, -1)
         self.assertEqual(result, expected_result)
+        self.root.flush()
+        self.assertEqual(self.root.part, value)
