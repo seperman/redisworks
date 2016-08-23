@@ -5,7 +5,15 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
+  - "pypy"
+  - "pypy3"
 
 sudo: false
 
-script: nosetests
+install:
+  - pip install coveralls dotobject
+
+script: coverage run --source redisworks setup.py test
+
+after_success:
+  - coveralls
