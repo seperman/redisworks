@@ -143,6 +143,8 @@ class Root(Dot):
     def load(self, paths):
         # import ipdb; ipdb.set_trace()
         # majority of keys are strings so we first try to get the string ones.
+        # Note that fakeredis loads all keys by mget but redis does ONLY if they
+        # are strings.
         result = {}
         values = self.red.mget(paths)
 
@@ -152,14 +154,17 @@ class Root(Dot):
                 redis_type = self.red.type(key)
                 if redis_type is None:
                     logger.error("Unable to get item: %s", key)
-                elif redis_type == "string":
-                    continue
-                elif redis_type == "list":
+                elif redis_type == b"string":
+                    value = self.get_str(value)
+                elif redis_type == b"list":
                     value = self.red.lrange(key, 0, -1)
-                elif redis_type == "set":
+                    value = [self.get_str(i) for i in value]
+                elif redis_type == b"set":
                     value = self.red.smembers(key)
-                elif redis_type == "hash":
+                    value = {self.get_str(i) for i in value}
+                elif redis_type == b"hash":
                     value = self.red.hgetall(key)
+                    value = {self.get_str(i): self.get_str(value[i]) for i in value}
                 else:
                     value = "NOT SUPPORTED BY REDISWORKS."
             else:

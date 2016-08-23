@@ -70,5 +70,27 @@ list
 
 Redis works returns Lazy queries just like how Django returns lazy queries. In fact the lazy objects code is borrowed from Django!
 
-If you ran the example from [Saving to Redis](#saving-to-redis), run a flush to empty Redisworks Cache. This is so it goes and gets the objects from Redis instead of reading its own current copy of data:
+If you ran the example from [Saving to Redis](#saving-to-redis), run a flush `root.flush()` to empty Redisworks Cache. This is so it goes and gets the objects from Redis instead of reading its own current copy of data:
 
+```py
+>>> from redisworks import Root
+>>> import datetime
+>>> root = Root()
+>>> thetime = root.time
+>>> thelist = root.my.list
+>>> mydict = root.the.mapping.example
+>>> mydict  # is not evalurated yet!
+<Lazy object: root.the.mapping.example>
+>>> print(mydict)
+{1: 1, 'a': 'b'}  # Now all the 3 objects are read from Redis!
+>>> mydict
+{1: 1, 'a': 'b'}
+>>> root.my.list
+[1, 3, 4]
+>>> root.time
+2016-08-22 10:03:19
+```
+
+# Other example
+
+Take a look at [example.py](example.py)
