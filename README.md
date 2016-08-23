@@ -91,6 +91,6 @@ If you ran the example from [Saving to Redis](#saving-to-redis), run a flush `ro
 2016-08-22 10:03:19
 ```
 
-# Other example
+# Other examples
 
 Take a look at [example.py](example.py)
