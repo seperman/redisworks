@@ -1,5 +1,9 @@
 # Redisworks 0.2.0
 
+![Python Versions](https://img.shields.io/pypi/pyversions/redisworks.svg?style=flat)
+![License](https://img.shields.io/pypi/l/redisworks.svg?version=latest)
+[![Build Status](https://travis-ci.org/seperman/redisworks.svg?branch=master)](https://travis-ci.org/seperman/redisworks)
+
 **The Pythonic Redis Client**
 
 Why Redisworks?
