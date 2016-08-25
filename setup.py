@@ -22,6 +22,7 @@ setup(name='redisworks',
       license='MIT',
       packages=['redisworks'],
       zip_safe=False,
+      test_suite="tests",
       long_description=long_description,
       install_requires=[
           'redis',
