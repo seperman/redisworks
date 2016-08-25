@@ -3,6 +3,7 @@
 ![Python Versions](https://img.shields.io/pypi/pyversions/redisworks.svg?style=flat)
 ![License](https://img.shields.io/pypi/l/redisworks.svg?version=latest)
 [![Build Status](https://travis-ci.org/seperman/redisworks.svg?branch=master)](https://travis-ci.org/seperman/redisworks)
+[![Coverage Status](https://coveralls.io/repos/github/seperman/redisworks/badge.svg?branch=master)](https://coveralls.io/github/seperman/redisworks?branch=master)
 
 **The Pythonic Redis Client**
 
