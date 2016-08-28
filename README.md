@@ -23,6 +23,8 @@ Behind the scene, Redisworks uses [DotObject](https://github.com/seperman/dotobj
 
 `pip install redisworks`
 
+Note that RedisWorks needs Redis server 2.4+.
+
 # Setup
 
 let's say if you want all the keys in Redis to start with the word `root`.
