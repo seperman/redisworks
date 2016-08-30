@@ -158,3 +158,15 @@ class RedisworksTestCase(unittest.TestCase):
         num = self.root.num
         self.assertIsInstance(num, LazyDot)
         self.assertEqual(num * 2, 20)
+
+    def test_saving_set_removed_the_old_one(self):
+        self.root.myset = {1, 2, 3}
+        self.root.myset = {4, 5}
+        self.root.flush()
+        self.assertEqual(self.root.myset, {4, 5})
+
+    def test_saving_list_removed_the_old_one(self):
+        self.root.myset = [1, 2, 3]
+        self.root.myset = [4, 5]
+        self.root.flush()
+        self.assertEqual(self.root.myset, [4, 5])

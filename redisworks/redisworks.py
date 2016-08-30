@@ -186,6 +186,7 @@ class Root(Dot):
             self.red.set(path, value)
         elif isinstance(value, sets):
             value = self.doformat(value)
+            self.red.delete(path)
             self.red.sadd(path, *value)
         elif isinstance(value, numbers):
             value = self.doformat(value)
@@ -195,6 +196,7 @@ class Root(Dot):
             self.red.hmset(path, value)
         elif isinstance(value, Iterable):
             value = self.doformat(value)
+            self.red.delete(path)
             self.red.rpush(path, *value)
         else:
             value = self.doformat(value, the_type="obj")
