@@ -13,7 +13,7 @@ To run a specific test, run this from the root of repo:
 import unittest
 from decimal import Decimal
 import datetime
-
+from dot import LazyDot
 from redisworks import Root
 from redisworks.redisworks import bTYPE_IDENTIFIER, bITEM_DIVIDER
 from fakeredis import FakeStrictRedis
@@ -142,3 +142,19 @@ class RedisworksTestCase(unittest.TestCase):
         self.assertEqual(self.root.my.list, mylist)
         self.assertEqual(self.root.time, some_date)
         self.assertEqual(self.root.the.mapping.example, mydict)
+
+    def test_number_comparison(self):
+        self.root.num = 10
+        num = self.root.num
+        self.assertIsInstance(num, LazyDot)
+        self.assertTrue(num > 8)
+        self.assertTrue(num < 11)
+        self.assertTrue(num <= 12)
+        self.assertTrue(num >= 10)
+        self.assertFalse(num > 10)
+
+    def test_number_math(self):
+        self.root.num = 10
+        num = self.root.num
+        self.assertIsInstance(num, LazyDot)
+        self.assertEqual(num * 2, 20)
