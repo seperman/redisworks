@@ -15,7 +15,7 @@ Why Redisworks?
 
 Have you ever used PyRedis and wondered why you have to think about types all the time? That you have to constantly convert objects to strings and back and forth since Redis keeps most things as strings?
 
-That's why I wrote Redisworks. Redis works provides a Pythonic interface to Redis. Let Redisworks take care of type conversions for you.
+Redis works provides a Pythonic interface to Redis. Let Redisworks take care of type conversions for you.
 
 Behind the scene, Redisworks uses [DotObject](https://github.com/seperman/dotobject) to provide beautiful dot notation objects and lazy Redis queries.
 
@@ -52,18 +52,19 @@ Example:
 >>> import datetime
 >>> root = Root()
 >>> root.my.list = [1, 3, 4]
+>>> root.my.other.list = [1, [2, 2]]
 >>> 
 >>> some_date = datetime.datetime(2016, 8, 22, 10, 3, 19)
 >>> root.time = some_date
 >>> 
->>> root.the.mapping.example = {1:1, "a": "b"}
+>>> root.the.mapping.example = {1:1, "a": {"b": 10}}
 ```
 
 Redis works will automatically convert your object to the proper Redis type and immediately write it to Redis as soon as you assign an element!
 
 The respective keys for the above items will be just like what you type: `root.my.list`, `root.time`, `root.the.mapping.example`:
 
-In the redis-cli client:
+If you use redis-cli, you will notice that the data is saved in the proper Redis data type:
 
 ```
 127.0.0.1:6379> scan 0
@@ -81,6 +82,8 @@ list
 
 # Reading from Redis
 
+Reading the data is as simple as if it was just saved in Python memory!
+
 Redis works returns Lazy queries just like how Django returns lazy queries. In fact the lazy objects code is borrowed from Django!
 
 If you ran the example from [Saving to Redis](#saving-to-redis), run a flush `root.flush()` to empty Redisworks Cache. This is so it goes and gets the objects from Redis instead of reading its own current copy of data:
@@ -95,14 +98,45 @@ If you ran the example from [Saving to Redis](#saving-to-redis), run a flush `ro
 >>> mydict  # is not evalurated yet!
 <Lazy object: root.the.mapping.example>
 >>> print(mydict)
-{1: 1, 'a': 'b'}  # Now all the 3 objects are read from Redis!
+{1:1, "a": {"b": 10}}  # Now all the 3 objects are read from Redis!
 >>> mydict
-{1: 1, 'a': 'b'}
+{1:1, "a": {"b": 10}}
 >>> root.my.list
 [1, 3, 4]
+>>> root.my.other.list
+[1, [2, 2]]
 >>> root.time
 2016-08-22 10:03:19
 ```
+
+# Changing root key name
+
+Every key name by default starts with the word `root`.
+If you want to use another name, simple subclass `Root`:
+
+```py
+>>> from redisworks import Root
+>>> post=Post()
+>>> post.item1 = "something"  # saves to Redis
+...
+>>> print(post.item1)  # loads from Redis
+something
+```
+
+# Numbers as attribute names
+
+Let's say you want `root.1` as a key name.
+Python does not allow attribute names start with numbers.
+
+All you need to do is start the number with the character `i` so Redisworks takes care of it for you:
+
+```py
+>>> root.i1 = 10
+>>> print(root.i1)
+10
+```
+
+The actual key in Redis will be `root.1`
 
 # Other examples
 
