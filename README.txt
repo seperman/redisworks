@@ -1,4 +1,4 @@
-**Redisworks 0.2.5**
+**Redisworks 0.2.6**
 
 **The Pythonic Redis Client**
 

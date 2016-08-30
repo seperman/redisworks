@@ -1,4 +1,4 @@
-# Redisworks 0.2.5
+# Redisworks 0.2.6
 
 ![Python Versions](https://img.shields.io/pypi/pyversions/redisworks.svg?style=flat)
 ![License](https://img.shields.io/pypi/l/redisworks.svg?version=latest)
