@@ -143,6 +143,13 @@ class RedisworksTestCase(unittest.TestCase):
         self.assertEqual(self.root.time, some_date)
         self.assertEqual(self.root.the.mapping.example, mydict)
 
+    def test_change_key_type(self):
+        mylist = [1, 3, 4]
+        self.root.something = mylist
+        st = "string"
+        self.root.something = st
+        self.assertEqual(self.root.something, st)
+
     def test_number_comparison(self):
         self.root.num = 10
         num = self.root.num

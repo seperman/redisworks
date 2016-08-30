@@ -4,6 +4,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from dot import Dot
 from redis import StrictRedis
+from redis.exceptions import ResponseError
 from redisworks.helper import py3
 import datetime
 from decimal import Decimal
@@ -180,7 +181,7 @@ class Root(Dot):
 
         return result
 
-    def save(self, path, value):
+    def __save_in_redis(self, path, value):
         if isinstance(value, strings):
             value = self.doformat(value)
             self.red.set(path, value)
@@ -201,3 +202,11 @@ class Root(Dot):
         else:
             value = self.doformat(value, the_type="obj")
             self.red.set(path, value)
+
+    def save(self, path, value):
+        try:
+            self.__save_in_redis(path, value)
+        except ResponseError as e:
+            if str(e) == 'WRONGTYPE Operation against a key holding the wrong kind of value':
+                self.red.delete(path)
+                self.__save_in_redis(path, value)
