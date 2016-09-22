@@ -90,7 +90,6 @@ If you ran the example from [Saving to Redis](#saving-to-redis), run a flush `ro
 
 ```py
 >>> from redisworks import Root
->>> import datetime
 >>> root = Root()
 >>> thetime = root.time
 >>> thelist = root.my.list
@@ -116,6 +115,8 @@ If you want to use another name, simple subclass `Root`:
 
 ```py
 >>> from redisworks import Root
+>>> class Post(Root):
+...     pass
 >>> post=Post()
 >>> post.item1 = "something"  # saves to Redis
 ...
