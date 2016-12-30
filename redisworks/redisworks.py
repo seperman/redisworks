@@ -153,7 +153,7 @@ class Root(Dot):
             key = paths[i]
             if value is None:
                 redis_type = self.red.type(key)
-                if redis_type is None:
+                if redis_type in (None, b'none'):
                     logger.error("Unable to get item: %s", key)
                 elif redis_type == b"string":
                     value = self.get_str(value)
@@ -210,3 +210,5 @@ class Root(Dot):
             if str(e) == 'WRONGTYPE Operation against a key holding the wrong kind of value':
                 self.red.delete(path)
                 self.__save_in_redis(path, value)
+            else:
+                raise

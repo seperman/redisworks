@@ -73,6 +73,7 @@ class RedisworksTestCase(unittest.TestCase):
         self.assertEqual(result, expected_result)
         self.root.flush()
         self.assertEqual(self.root.haha.wahaha, string)
+        self.assertEqual(self.root['haha.wahaha'], string)
 
     def test_child_set(self):
         value = {1, 2, 4}
