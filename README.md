@@ -139,6 +139,21 @@ All you need to do is start the number with the character `i` so Redisworks take
 
 The actual key in Redis will be `root.1`
 
+# Dynamic key names
+
+```py
+>>> path1 = 'blah'
+>>> path2 = 'blah.here`'
+
+>>> root[path1] = 'foo'
+>>> root[path2] = 'foo bar'
+
+>>> root.blah
+foo
+>>> root.blah.here
+foo bar
+```
+
 # Other examples
 
 Take a look at [example.py](example.py)
