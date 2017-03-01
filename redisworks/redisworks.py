@@ -64,10 +64,10 @@ def str_to_class(name):
 class Root(Dot):
 
     def __init__(self, host='localhost', port=6379, db=0,
-                 return_object=True, *args, **kwargs):
+                 return_object=True, conn=False, *args, **kwargs):
         redis = kwargs.pop('redis', StrictRedis)
         super(Root, self).__init__(*args, **kwargs)
-        self.red = redis(host=host, port=port, db=db)
+        self.red = conn or redis(host=host, port=port, db=db)
         self.return_object = return_object
         self.setup()
 
