@@ -128,6 +128,8 @@ class Root(Dot):
             value = datetime.datetime.strptime(value, DATE_FORMAT).date()
         elif actual_type in {dict, list} or isinstance(actual_type, (MutableMapping, Iterable)):
             value = json.loads(value)
+        elif actual_type is bool:
+            value = actual_type == "True"
         else:
             value = actual_type(value)
 
