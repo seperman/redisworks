@@ -1,0 +1,5 @@
+-r requirements.txt
+bump2version==1.0.0
+ipdb==0.13.2
+pytest==6.1.1
+pytest_cov==2.10.1

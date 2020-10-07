@@ -1,31 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import print_function
+import json
+import logging
+import builtins
+import datetime
 from dot import Dot
 from redis import StrictRedis
 from redis.exceptions import ResponseError
 from redisworks.helper import py3
-import datetime
 from decimal import Decimal
 from collections import Iterable
 from collections import MutableMapping
-import json
-import logging
-logger = logging.getLogger(__name__)
+from builtins import int
+strings = (str, bytes)  # which are both basestring
+numbers = (int, float, complex, datetime.datetime, datetime.date, Decimal)
+items = 'items'
 
+logger = logging.getLogger(__name__)
 sets = (set, frozenset)
-if py3:  # pragma: no cover
-    from builtins import int
-    strings = (str, bytes)  # which are both basestring
-    numbers = (int, float, complex, datetime.datetime, datetime.date, Decimal)
-    items = 'items'
-    import builtins
-else:  # pragma: no cover
-    strings = (str, unicode)
-    numbers = (int, float, long, complex, datetime.datetime, datetime.date, Decimal)
-    items = 'iteritems'
-    import __builtin__ as builtins
 
 
 TYPE_IDENTIFIER = '!__'
@@ -50,7 +42,7 @@ TYPE_FORMATS = {
 
 for i in TYPE_FORMATS:
     TYPE_FORMATS[i] = TYPE_IDENTIFIER + TYPE_FORMATS[i] + ITEM_DIVIDER +\
-                      '{actual_type}' + ITEM_DIVIDER + '{value}'
+        '{actual_type}' + ITEM_DIVIDER + '{value}'
 
 
 def str_to_class(name):
@@ -64,7 +56,7 @@ def str_to_class(name):
 class Root(Dot):
 
     def __init__(self, host='localhost', port=6379, db=0,
-                 return_object=True, conn=False, *args, **kwargs):
+                 return_object=True, conn=None, *args, **kwargs):
         redis = kwargs.pop('redis', StrictRedis)
         super(Root, self).__init__(*args, **kwargs)
         self.red = conn or redis(host=host, port=port, db=db)
@@ -142,7 +134,6 @@ class Root(Dot):
         return value
 
     def load(self, paths):
-        # import ipdb; ipdb.set_trace()
         # majority of keys are strings so we first try to get the string ones.
         # Note that fakeredis loads all keys by mget but redis does ONLY if they
         # are strings.
@@ -194,7 +185,7 @@ class Root(Dot):
             self.red.set(path, value)
         elif isinstance(value, MutableMapping):
             value = self.doformat(value)
-            self.red.hmset(path, value)
+            self.red.hset(path, mapping=value)
         elif isinstance(value, Iterable):
             value = self.doformat(value)
             self.red.delete(path)

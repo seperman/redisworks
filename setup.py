@@ -13,7 +13,7 @@ except:
     long_description = "Pythonic Redis Client."
 
 setup(name='redisworks',
-      version='0.2.7',
+      version='0.3.0',
       description='Pythonic Redis Client.',
       url='https://github.com/seperman/redisworks',
       download_url='https://github.com/seperman/redisworks/tarball/master',
@@ -28,15 +28,15 @@ setup(name='redisworks',
           'redis',
           'dotobject'
       ],
-      tests_require=['fakeredis==0.8.2'],
+      tests_require=['fakeredis==1.4.3', 'pytest==6.1.1'],
       classifiers=[
           "Intended Audience :: Developers",
           "Operating System :: OS Independent",
           "Topic :: Software Development",
-          "Programming Language :: Python :: 2.7",
-          "Programming Language :: Python :: 3.3",
-          "Programming Language :: Python :: 3.4",
           "Programming Language :: Python :: 3.5",
+          "Programming Language :: Python :: 3.6",
+          "Programming Language :: Python :: 3.7",
+          "Programming Language :: Python :: 3.8",
           "Programming Language :: Python :: Implementation :: PyPy",
           "Development Status :: 3 - Alpha",
           "License :: OSI Approved :: MIT License"
