@@ -1,4 +1,5 @@
 language: python
+cache: pip
 
 python:
   - "3.5"
@@ -11,9 +12,9 @@ python:
 sudo: false
 
 install:
-  - pip install coveralls dotobject
+  - pip install -r requirements-dev.txt
 
-script: coverage run --source redisworks setup.py test
+script: pytest --cov=deepdiff tests/
 
 after_success:
   - coveralls

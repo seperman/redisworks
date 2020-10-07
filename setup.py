@@ -12,6 +12,17 @@ try:
 except:
     long_description = "Pythonic Redis Client."
 
+
+def get_reqs(filename):
+    with open(filename, "r") as reqs_file:
+        reqs = reqs_file.readlines()
+        reqs = list(map(lambda x: x.replace('==', '>='), reqs))
+    return reqs
+
+
+reqs = get_reqs("requirements.txt")
+
+
 setup(name='redisworks',
       version='0.3.0',
       description='Pythonic Redis Client.',
@@ -24,10 +35,7 @@ setup(name='redisworks',
       zip_safe=False,
       test_suite="tests",
       long_description=long_description,
-      install_requires=[
-          'redis',
-          'dotobject'
-      ],
+      install_requires=reqs,
       tests_require=['fakeredis==1.4.3', 'pytest==6.1.1'],
       classifiers=[
           "Intended Audience :: Developers",
