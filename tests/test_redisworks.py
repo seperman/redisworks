@@ -176,3 +176,12 @@ class TestRedisworks:
         self.root.myset = [4, 5]
         self.root.flush()
         assert self.root.myset == [4, 5]
+
+    def test_reverse_operations(self):
+        self.root.num = 10
+        assert self.root.num + 1 == 11
+        assert 1 + self.root.num == 11
+        assert self.root.num > 9
+        assert self.root.num < 12
+        assert 9 < self.root.num
+        assert 12 > self.root.num

@@ -7,7 +7,6 @@ import datetime
 from dot import Dot
 from redis import StrictRedis
 from redis.exceptions import ResponseError
-from redisworks.helper import py3
 from decimal import Decimal
 from collections import Iterable
 from collections import MutableMapping
@@ -56,10 +55,10 @@ def str_to_class(name):
 class Root(Dot):
 
     def __init__(self, host='localhost', port=6379, db=0,
-                 return_object=True, conn=None, *args, **kwargs):
+                 return_object=True, conn=None, password=None, *args, **kwargs):
         redis = kwargs.pop('redis', StrictRedis)
-        super(Root, self).__init__(*args, **kwargs)
-        self.red = conn or redis(host=host, port=port, db=db)
+        super(Root, self).__init__()
+        self.red = conn or redis(host=host, port=port, db=db, *args, **kwargs)
         self.return_object = return_object
         self.setup()
 
@@ -105,12 +104,8 @@ class Root(Dot):
     def get_obj(value, actual_type):
         actual_type = str_to_class(actual_type.decode('utf-8'))
 
-        if py3:
-            if actual_type is not bytes:
-                value = value.decode('utf-8')
-        else:
-            if actual_type is unicode:
-                value = value.decode('utf-8')
+        if actual_type is not bytes:
+            value = value.decode('utf-8')
 
         if actual_type in {Decimal, complex}:
             value = actual_type(value)
@@ -203,3 +198,6 @@ class Root(Dot):
                 self.__save_in_redis(path, value)
             else:
                 raise
+
+    # def __add__(self, other):
+    #     return 

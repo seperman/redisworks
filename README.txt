@@ -28,6 +28,14 @@ Or if you want to be more specific:
 setup
     >>> root = Root(host='localhost', port=6379, db=0)
 
+
+**password**
+
+Any other parameter that you pass to Root will be passed down to PyRedis. For example:
+
+setup
+    >>> root = Root(host='localhost', port=6379, db=0, password='mypass')
+
 **Saving to Redis**
 
 Saving to Redis is as simple as assigning objects to attributes of root or attributes of attributes of root (you can go as deep as you want.)
