@@ -36,7 +36,6 @@ setup(name='redisworks',
       test_suite="tests",
       long_description=long_description,
       install_requires=reqs,
-      tests_require=['fakeredis==1.4.3', 'pytest==6.1.1'],
       classifiers=[
           "Intended Audience :: Developers",
           "Operating System :: OS Independent",
@@ -46,7 +45,7 @@ setup(name='redisworks',
           "Programming Language :: Python :: 3.7",
           "Programming Language :: Python :: 3.8",
           "Programming Language :: Python :: Implementation :: PyPy",
-          "Development Status :: 3 - Alpha",
+          "Development Status :: 5 - Production/Stable",
           "License :: OSI Approved :: MIT License"
       ],
       )
