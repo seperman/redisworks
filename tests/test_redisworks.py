@@ -40,6 +40,17 @@ class TestRedisworks:
                            b'dict' + bITEM_DIVIDER + b'{"a": "hello"}'}
         assert result == expected_result
 
+    def test_dict_reassignement(self):
+        value1 = {"a": "b"}
+        value2 = {"c": "d"}
+
+        self.root.body = value1
+        self.root.body = value2
+        self.root.flush()
+
+        assert self.root.body == value2
+
+
     def test_numbers(self):
         today = datetime.date.today()
         now = datetime.datetime.utcnow()
