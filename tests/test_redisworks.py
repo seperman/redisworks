@@ -194,3 +194,10 @@ class TestRedisworks:
 
         assert self.root.true_variable == True
         assert self.root.false_variable == False
+    
+    def test_redis_key_pattern_operations(self):
+        VALUE = "___=random__string___"
+        self.root.string = VALUE
+        self.root.flush()
+
+        assert self.root.string == VALUE
