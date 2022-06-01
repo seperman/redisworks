@@ -185,3 +185,12 @@ class TestRedisworks:
         assert self.root.num < 12
         assert 9 < self.root.num
         assert 12 > self.root.num
+
+    def test_boolean_storage_operations(self):
+        self.root.true_variable = True
+        self.root.false_variable = False
+
+        self.root.flush()
+
+        assert self.root.true_variable == True
+        assert self.root.false_variable == False
