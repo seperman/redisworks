@@ -55,9 +55,10 @@ def str_to_class(name):
 class Root(Dot):
 
     def __init__(self, host='localhost', port=6379, db=0,
-                 return_object=True, conn=None, password=None, *args, **kwargs):
+                 return_object=True, conn=None, password=None, namespace=None, *args, **kwargs):
         redis = kwargs.pop('redis', StrictRedis)
-        super(Root, self).__init__()
+        # Passing different value for root
+        super(Root, self).__init__(root_name=namespace)
         self.red = conn or redis(host=host, port=port, db=db, *args, **kwargs)
         self.return_object = return_object
         self.setup()
@@ -199,6 +200,7 @@ class Root(Dot):
             self.red.set(path, value)
 
     def save(self, path, value):
+        print(f"My path: {path}")
         try:
             self.__save_in_redis(path, value)
         except ResponseError as e:
