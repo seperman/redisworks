@@ -127,12 +127,10 @@ class Root(Dot):
 
     def get_str(self, value):
         if value.startswith(bTYPE_IDENTIFIER):
-            print(f"Value before strip: {value}")
             # Doing lstrip to clear out the pattern from left side of the string
             # e.g., b'!__str|==|{actual_type}|==|{value}'
             # becomes b'{actual_type}|==|{value}'
             value = value.lstrip(bTYPE_IDENTIFIER)
-            print(f"Value after strip: {value}")
             global_type, actual_type, value = value.split(bITEM_DIVIDER)
             if self.return_object:
                 value = self.get_obj(value, actual_type)
