@@ -188,6 +188,7 @@ class Root(Dot):
             self.red.set(path, value)
         elif isinstance(value, MutableMapping):
             value = self.doformat(value)
+            self.red.delete(path)
             self.red.hset(path, mapping=value)
         elif isinstance(value, Iterable):
             value = self.doformat(value)
