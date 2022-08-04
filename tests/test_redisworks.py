@@ -93,6 +93,12 @@ class TestRedisworks:
         self.root.flush()
         assert self.root.part_set == value
 
+    def test_pattern_containing_string(self):
+        value = f"{bTYPE_IDENTIFIER}some randomg string{bTYPE_IDENTIFIER}"
+        self.root.value = value
+        self.root.flush()
+        assert self.root.value == value
+
     def test_child_dict(self):
         value = {1: 1, 2: 2, 3: 4}
         expected_result = Root.doformat(value)
