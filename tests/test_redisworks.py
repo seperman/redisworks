@@ -218,3 +218,22 @@ class TestRedisworks:
         self.root.flush()
 
         assert self.root.string == VALUE
+
+    def test_dynamic_namespace_creation(self):
+        CUSTOM_NAMESPACE = "pass"
+        REDIS_VALUE = "my custom string"
+
+        redis_conn = FakeStrictRedis()
+        root = Root(conn=redis_conn, namespace=CUSTOM_NAMESPACE)
+        root.foo = REDIS_VALUE
+
+        redis_value = redis_conn.get(f"{CUSTOM_NAMESPACE}.foo")
+        assert REDIS_VALUE in redis_value.decode("UTF-8")
+
+    def test_int_keys(self):
+        redis_conn = FakeStrictRedis()
+        root = Root(conn=redis_conn)
+        root[123] = 'foo'
+        assert 'foo' == root[123]
+        root.i2 = 'bar'
+        assert 'bar' == root[2]
