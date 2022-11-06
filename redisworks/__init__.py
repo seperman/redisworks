@@ -1,7 +1,7 @@
 import logging
 from .redisworks import Root, with_ttl  # NOQA
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 
 if __name__ == '__main__':

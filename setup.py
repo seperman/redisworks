@@ -24,7 +24,7 @@ reqs = get_reqs("requirements.txt")
 
 
 setup(name='redisworks',
-      version='0.3.0',
+      version='0.4.0',
       description='Pythonic Redis Client.',
       url='https://github.com/seperman/redisworks',
       download_url='https://github.com/seperman/redisworks/tarball/master',
