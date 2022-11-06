@@ -120,7 +120,16 @@ If you ran the example from [Saving to Redis](#saving-to-redis), run a flush `ro
 # Changing root key name
 
 Every key name by default starts with the word `root`.
-If you want to use another name, simple subclass `Root`:
+If you want to use another name, you have two options:
+
+Option 1, pass a namespace:
+
+```py
+>>> mynamespace = Root(conn=redis_conn, namespace='mynamespace')
+>>> mynamespace.foo = 'bar'
+```
+
+Option 2, simply subclass `Root`:
 
 ```py
 >>> from redisworks import Root
@@ -162,6 +171,24 @@ foo
 >>> root.blah.here
 foo bar
 ```
+
+
+# Passing TTL to the keys
+
+You can use the `with_ttl` helper.
+
+```py
+>>> from redisworks import Root, with_ttl
+>>> self.root.myset = with_ttl([1, 2, 3], ttl=1)
+>>> self.root.flush()
+>>> self.root.myset
+[1, 2, 3]
+>>> time.sleep(1.2)
+>>> self.root.flush()
+>>> self.root.myset
+
+```
+
 
 # Other examples
 

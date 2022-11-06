@@ -1,5 +1,5 @@
 import logging
-from .redisworks import Root  # NOQA
+from .redisworks import Root, with_ttl  # NOQA
 
 __version__ = '0.3.0'
 

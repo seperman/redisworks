@@ -8,8 +8,7 @@ from dot import Dot
 from redis import StrictRedis
 from redis.exceptions import ResponseError
 from decimal import Decimal
-from collections import Iterable
-from collections import MutableMapping
+from collections.abc import Iterable, MutableMapping
 from builtins import int
 strings = (str, bytes)  # which are both basestring
 numbers = (int, float, complex, datetime.datetime, datetime.date, Decimal)
@@ -59,7 +58,7 @@ class Root(Dot):
         redis = kwargs.pop('redis', StrictRedis)
         # Passing different value for root
         super(Root, self).__init__(root_name=namespace)
-        self.red = conn or redis(host=host, port=port, db=db, *args, **kwargs)
+        self.red = conn or redis(host=host, port=port, db=db, password=password, *args, **kwargs)
         self.return_object = return_object
         self.setup()
 
@@ -200,9 +199,15 @@ class Root(Dot):
             self.red.set(path, value)
 
     def save(self, path, value):
-        print(f"My path: {path}")
+        if isinstance(value, with_ttl):
+            ttl = value.ttl
+            value = value.value
+        else:
+            ttl = None
         try:
             self.__save_in_redis(path, value)
+            if ttl is not None:
+                self.red.expire(name=path, time=ttl)
         except ResponseError as e:
             if str(e) == 'WRONGTYPE Operation against a key holding the wrong kind of value':
                 self.red.delete(path)
@@ -210,5 +215,12 @@ class Root(Dot):
             else:
                 raise
 
-    # def __add__(self, other):
-    #     return 
+
+class with_ttl:
+    """
+    Take the ttl in the format of number of seconds or timedelta for the key
+    """
+
+    def __init__(self, value, ttl):
+        self.value = value
+        self.ttl = ttl
