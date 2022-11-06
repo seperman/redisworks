@@ -9,10 +9,11 @@ To run a specific test, run this from the root of repo:
     python -m unittest tests.tests.RedisworksTestCase.test_child_dict
 """
 
-from decimal import Decimal
+import time
 import datetime
 from dot import LazyDot
-from redisworks import Root
+from decimal import Decimal
+from redisworks import Root, with_ttl
 from redisworks.redisworks import bTYPE_IDENTIFIER, bITEM_DIVIDER
 from fakeredis import FakeStrictRedis
 import logging
@@ -49,7 +50,6 @@ class TestRedisworks:
         self.root.flush()
 
         assert self.root.body == value2
-
 
     def test_numbers(self):
         today = datetime.date.today()
@@ -237,3 +237,12 @@ class TestRedisworks:
         assert 'foo' == root[123]
         root.i2 = 'bar'
         assert 'bar' == root[2]
+
+    def test_ttl(self):
+
+        self.root.myset = with_ttl([1, 2, 3], ttl=1)
+        self.root.flush()
+        assert self.root.myset == [1, 2, 3]
+        time.sleep(1.2)
+        self.root.flush()
+        assert not self.root.myset

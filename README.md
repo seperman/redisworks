@@ -172,6 +172,24 @@ foo
 foo bar
 ```
 
+
+# Passing TTL to the keys
+
+You can use the `with_ttl` helper.
+
+```py
+>>> from redisworks import Root, with_ttl
+>>> self.root.myset = with_ttl([1, 2, 3], ttl=1)
+>>> self.root.flush()
+>>> self.root.myset
+[1, 2, 3]
+>>> time.sleep(1.2)
+>>> self.root.flush()
+>>> self.root.myset
+
+```
+
+
 # Other examples
 
 Take a look at [example.py](example.py)

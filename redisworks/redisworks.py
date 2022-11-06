@@ -199,11 +199,28 @@ class Root(Dot):
             self.red.set(path, value)
 
     def save(self, path, value):
+        if isinstance(value, with_ttl):
+            ttl = value.ttl
+            value = value.value
+        else:
+            ttl = None
         try:
             self.__save_in_redis(path, value)
+            if ttl is not None:
+                self.red.expire(name=path, time=ttl)
         except ResponseError as e:
             if str(e) == 'WRONGTYPE Operation against a key holding the wrong kind of value':
                 self.red.delete(path)
                 self.__save_in_redis(path, value)
             else:
                 raise
+
+
+class with_ttl:
+    """
+    Take the ttl in the format of number of seconds or timedelta for the key
+    """
+
+    def __init__(self, value, ttl):
+        self.value = value
+        self.ttl = ttl
