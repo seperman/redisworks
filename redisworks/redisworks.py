@@ -8,8 +8,7 @@ from dot import Dot
 from redis import StrictRedis
 from redis.exceptions import ResponseError
 from decimal import Decimal
-from collections import Iterable
-from collections import MutableMapping
+from collections.abc import Iterable, MutableMapping
 from builtins import int
 strings = (str, bytes)  # which are both basestring
 numbers = (int, float, complex, datetime.datetime, datetime.date, Decimal)

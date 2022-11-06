@@ -22,11 +22,11 @@ logging.disable(logging.CRITICAL)
 class TestRedisworks:
 
     """RedisWorks Tests."""
-    def setup(self):
+    def setup_method(self):
         self.red = FakeStrictRedis()
         self.root = Root(conn=self.red)
 
-    def teardown(self):
+    def teardown_method(self):
         # Clear data in fakeredis.
         self.red.flushall()
 
