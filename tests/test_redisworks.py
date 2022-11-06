@@ -22,11 +22,11 @@ logging.disable(logging.CRITICAL)
 class TestRedisworks:
 
     """RedisWorks Tests."""
-    def setup(self):
+    def setup_method(self):
         self.red = FakeStrictRedis()
         self.root = Root(conn=self.red)
 
-    def teardown(self):
+    def teardown_method(self):
         # Clear data in fakeredis.
         self.red.flushall()
 
@@ -229,3 +229,11 @@ class TestRedisworks:
 
         redis_value = redis_conn.get(f"{CUSTOM_NAMESPACE}.foo")
         assert REDIS_VALUE in redis_value.decode("UTF-8")
+
+    def test_int_keys(self):
+        redis_conn = FakeStrictRedis()
+        root = Root(conn=redis_conn)
+        root[123] = 'foo'
+        assert 'foo' == root[123]
+        root.i2 = 'bar'
+        assert 'bar' == root[2]

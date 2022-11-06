@@ -8,8 +8,7 @@ from dot import Dot
 from redis import StrictRedis
 from redis.exceptions import ResponseError
 from decimal import Decimal
-from collections import Iterable
-from collections import MutableMapping
+from collections.abc import Iterable, MutableMapping
 from builtins import int
 strings = (str, bytes)  # which are both basestring
 numbers = (int, float, complex, datetime.datetime, datetime.date, Decimal)
@@ -59,7 +58,7 @@ class Root(Dot):
         redis = kwargs.pop('redis', StrictRedis)
         # Passing different value for root
         super(Root, self).__init__(root_name=namespace)
-        self.red = conn or redis(host=host, port=port, db=db, *args, **kwargs)
+        self.red = conn or redis(host=host, port=port, db=db, password=password, *args, **kwargs)
         self.return_object = return_object
         self.setup()
 
@@ -200,7 +199,6 @@ class Root(Dot):
             self.red.set(path, value)
 
     def save(self, path, value):
-        print(f"My path: {path}")
         try:
             self.__save_in_redis(path, value)
         except ResponseError as e:
@@ -209,6 +207,3 @@ class Root(Dot):
                 self.__save_in_redis(path, value)
             else:
                 raise
-
-    # def __add__(self, other):
-    #     return 

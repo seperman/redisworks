@@ -120,7 +120,16 @@ If you ran the example from [Saving to Redis](#saving-to-redis), run a flush `ro
 # Changing root key name
 
 Every key name by default starts with the word `root`.
-If you want to use another name, simple subclass `Root`:
+If you want to use another name, you have two options:
+
+Option 1, pass a namespace:
+
+```py
+>>> mynamespace = Root(conn=redis_conn, namespace='mynamespace')
+>>> mynamespace.foo = 'bar'
+```
+
+Option 2, simply subclass `Root`:
 
 ```py
 >>> from redisworks import Root
