@@ -36,7 +36,7 @@ jobs:
     - name: Test with pytest and get the coverage
       if: matrix.python-version == 3.10
       run: |
-        pytest --cov-report=xml --cov=dot tests/ --runslow
+        pytest --cov-report=xml --cov=dot tests/
     - name: Test with pytest and no coverage report
       if: matrix.python-version != 3.10
       run: |
